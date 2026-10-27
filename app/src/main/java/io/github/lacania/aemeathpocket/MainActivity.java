@@ -54,7 +54,7 @@ public final class MainActivity extends Activity {
         ScrollView scroll=new ScrollView(this);scroll.setFillViewport(true);scroll.setBackgroundColor(0xfffff6fb);
         root=new LinearLayout(this);root.setOrientation(LinearLayout.VERTICAL);root.setPadding(dp(24),dp(24),dp(24),dp(32));scroll.addView(root);
         if(Build.VERSION.SDK_INT>=30){getWindow().setDecorFitsSystemWindows(false);root.setOnApplyWindowInsetsListener((view,insets)->{Insets bars=insets.getInsets(WindowInsets.Type.systemBars()|WindowInsets.Type.displayCutout());view.setPadding(dp(24)+bars.left,dp(24)+bars.top,dp(24)+bars.right,dp(32)+bars.bottom);return insets;});}
-        text(root,"FLYING EDELWEISS",12,MUTED,true);text(root,"飞行雪绒",28,INK,true);
+        text(root,"Fleet Snowfluff",12,MUTED,true);text(root,"飞行雪绒",28,INK,true);
         TextView intro=text(root,"把喜欢的角色，放在你的屏幕上。",15,MUTED,false);margin(intro,8,14);
         List<String> ids=store.ids();text(root,"已添加 "+ids.size()+" / "+PetStore.MAX_PETS+" 只 · 可重复选择同一角色",13,MUTED,false);
         LinearLayout roster=new LinearLayout(this);root.addView(roster);margin(roster,10,8);
@@ -80,7 +80,7 @@ public final class MainActivity extends Activity {
             renderSelected();
         }else{TextView empty=text(root,"列表已经清空，点击“添加桌宠”选择角色。",15,MUTED,false);margin(empty,24,12);}
         TextView help=text(root,"原地长按约 0.6 秒后松手打开单只菜单，拖动可以换位置。熄屏暂停绘制，解锁或回到应用时重新检查显示状态。",13,MUTED,false);margin(help,20,8);
-        text(root,"个人测试版 0.2.1 · 本地运行",12,MUTED,false);
+        text(root,"个人测试版 0.2.2 · 本地运行",12,MUTED,false);
         setContentView(scroll);binding=false;updateStatus();
     }
     private void renderSelected(){

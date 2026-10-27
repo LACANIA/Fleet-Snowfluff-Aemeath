@@ -47,7 +47,7 @@ def prepare(walk_knocks):
 
 assert package.endswith('.test') and package!=production
 shell('am','force-stop',production)
-call('install','-r',project/('dist/Flying-Edelweiss-'+version+'-ui-test.apk'))
+call('install','-r',project/('dist/Fleet-Snowfluff-'+version+'-ui-test.apk'))
 shell('cmd','appops','set',package,'SYSTEM_ALERT_WINDOW','allow')
 try:
     start();shell('am','force-stop',package)

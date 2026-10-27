@@ -112,7 +112,7 @@ shell('am','force-stop',production)
 call('uninstall',package,check=False)
 call('install',project/'build/legacy-seed/probe.apk')
 shell('am','start','-n',package+'/io.github.lacania.seed.SeedActivity');time.sleep(.5)
-call('install','-r',project/('dist/Flying-Edelweiss-'+version+'-ui-test.apk'))
+call('install','-r',project/('dist/Fleet-Snowfluff-'+version+'-ui-test.apk'))
 shell('cmd','appops','set',package,'SYSTEM_ALERT_WINDOW','allow')
 try:
     start()

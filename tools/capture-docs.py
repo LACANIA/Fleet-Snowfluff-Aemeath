@@ -30,7 +30,7 @@ if dimensions()[0]>dimensions()[1] and manager:
     subprocess.run([manager,'control','-v',os.environ.get('MUMU_INSTANCE','0'),'tool','func','--name','rotate'],check=True,stdout=subprocess.PIPE,timeout=30)
     rotated=True;time.sleep(1)
 shell('am','force-stop',production)
-call('install','-r',project/('dist/Flying-Edelweiss-'+version+'-ui-test.apk'))
+call('install','-r',project/('dist/Fleet-Snowfluff-'+version+'-ui-test.apk'))
 shell('cmd','appops','set',package,'SYSTEM_ALERT_WINDOW','allow')
 try:
     start();shell('am','force-stop',package)

@@ -1,10 +1,10 @@
-# 飞行雪绒 · Flying Edelweiss
+# 飞行雪绒 · Fleet Snowfluff
 
 可以同时放出多只角色的安卓悬浮桌宠，现有爱弥斯、菲比、守岸人和弗洛洛。每只宠物分别设置，支持拖动、抛射弹跳和点击穿透；关闭设置页面后，仍可显示在桌面和其他应用上方。
 
-**当前版本：0.2.1 个人测试版，支持 Android 8.0 及以上。** 原名“爱弥斯口袋桌宠”，仓库地址保持不变。纯本地运行，无需 DSH、Codex 或 AI 接口，应用没有申请网络权限。目前仅提供安卓版本。
+**当前版本：0.2.2 个人测试版，支持 Android 8.0 及以上。** 原名“爱弥斯口袋桌宠”，仓库现名 `Fleet-Snowfluff-Aemeath`。纯本地运行，无需 DSH、Codex 或 AI 接口，应用没有申请网络权限。目前仅提供安卓版本。
 
-[下载 v0.2.1 安卓安装包](https://github.com/LACANIA/aemeath-pocket/releases/download/v0.2.1/Flying-Edelweiss-0.2.1-test.apk) · [版本说明与历史安装包](https://github.com/LACANIA/aemeath-pocket/releases)
+[下载 v0.2.2 安卓安装包](https://github.com/LACANIA/Fleet-Snowfluff-Aemeath/releases/download/v0.2.2/Fleet-Snowfluff-0.2.2-test.apk) · [版本说明与历史安装包](https://github.com/LACANIA/Fleet-Snowfluff-Aemeath/releases)
 
 ## 界面与效果
 
@@ -16,7 +16,7 @@
 
 ## 安装与使用
 
-1. 从 [Releases](https://github.com/LACANIA/aemeath-pocket/releases) 下载 `Flying-Edelweiss-0.2.1-test.apk`，在安卓手机上安装；旧版用户直接覆盖更新。
+1. 从 [Releases](https://github.com/LACANIA/Fleet-Snowfluff-Aemeath/releases) 下载 `Fleet-Snowfluff-0.2.2-test.apk`，在安卓手机上安装；旧版用户直接覆盖更新。
 2. 打开“飞行雪绒”，点击“添加桌宠”选择角色与数量，再点击“启动桌宠”，按提示允许显示悬浮窗；Android 13 及以上建议同时允许通知。
 3. 返回桌面或打开其他应用。按住宠物拖动可以换位置；默认松手停止，应用内开启“拖拽抛射”后，快速拖动松手会惯性飞出并在屏幕边缘弹跳，速度逐渐减小。再次按住可以停止，关闭开关也会停止抛射。
 4. 原地按住约 **0.6 秒后松手**，打开动作菜单。短按、拖动、拖动后返回原位都不会打开菜单；原地按住后再开始拖动，也按拖动处理。
@@ -105,7 +105,7 @@ export ANDROID_HOME=/path/to/android-sdk
 python3 tools/build.py
 ```
 
-输出为 `dist/Flying-Edelweiss-0.2.1-test.apk`。首次构建会在本机生成 `tools/personal-test.keystore`，只用于个人测试；该文件不会提交到仓库。同一设备继续覆盖安装时需要使用相同证书，请自行备份本机证书。重新生成证书的安装包无法直接覆盖使用旧证书的安装包。
+输出为 `dist/Fleet-Snowfluff-0.2.2-test.apk`。首次构建会在本机生成 `tools/personal-test.keystore`，只用于个人测试；该文件不会提交到仓库。同一设备继续覆盖安装时需要使用相同证书，请自行备份本机证书。重新生成证书的安装包无法直接覆盖使用旧证书的安装包。
 
 也可以使用本地隔离工具目录：已有的 `tools/prepare-toolchain.sh`、`tools/prepare-sdk.py` 用于本项目早期 Ubuntu 测试环境，其特定 JDK 包版本取决于发行版软件源是否仍然提供。日常构建建议通过上面的环境变量指定自己安装的 JDK 与 SDK。
 

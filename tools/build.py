@@ -66,7 +66,7 @@ key=tools/'personal-test.keystore'
 if not key.exists():
     run(java_home/'bin/keytool','-genkeypair','-keystore',key,'-storepass','android','-alias','personal-test','-keypass','android','-keyalg','RSA','-keysize','2048','-validity','10000','-dname','CN=Aemeath Personal Test')
 version=ET.parse(main/'AndroidManifest.xml').getroot().attrib['{http://schemas.android.com/apk/res/android}versionName']
-apk=dist/('Flying-Edelweiss-'+version+('-ui-test.apk' if args.test_variant else '-test.apk'))
+apk=dist/('Fleet-Snowfluff-'+version+('-ui-test.apk' if args.test_variant else '-test.apk'))
 run(java_home/'bin/java','-jar',build_tools/'lib/apksigner.jar','sign','--ks',key,'--ks-pass','pass:android','--key-pass','pass:android','--out',apk,build/'aligned.apk')
 run(java_home/'bin/java','-jar',build_tools/'lib/apksigner.jar','verify','--verbose',apk)
 run(build_tools/'zipalign','-c','4',apk)
