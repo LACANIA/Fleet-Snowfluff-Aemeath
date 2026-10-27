@@ -1,0 +1,21 @@
+爱弥斯口袋桌宠 · 素材来源
+
+本应用为个人使用的非官方同人安卓适配，角色爱弥斯与《鸣潮》相关视觉设计归相应权利方所有。
+
+融合项目一：https://github.com/hachimi-ai/dsh-aemeath
+使用扩展精灵图的日常表情。该项目声明代码 MIT，角色素材仅供个人学习交流。
+
+融合项目二：https://github.com/culture-flask/dsh-aemeath-pet
+使用六个原始透明 GIF，保留原始帧与播放时间，左右走动按需镜像。代码许可为 Apache-2.0，协议全文随应用附带。
+该项目说明：角色形象归 Kuro Games / 相应权利方所有，原始表情包来自 B 站“Neuro音乐”：
+https://www.bilibili.com/opus/1167003396733927448
+行与帧编排源自 https://github.com/ChuyuZhong/aemeath-codex-pet 。
+
+拖拽抛射算法移植自 PC2005-cloud/dsh-pet 的 src/shared/physics.ts：
+https://github.com/PC2005-cloud/dsh-pet
+Copyright (c) 2026 PC2005-cloud，MIT，协议全文随应用附带于 DSH-PET-MIT.txt。
+安卓适配加入 dp 缩放、完整窗口边界、触摸中断与独立开关。
+
+本应用素材处理：原始 GIF 抽帧、透明像素清理、图集重排、重复帧存储去重和动画名称本地化。
+没有将 DSH 皮肤、壁纸或工作状态连接放入应用。没有使用 AI 重新绘制角色。
+不对角色及原始美术素材授予额外商业许可。

@@ -1,0 +1,16 @@
+{
+  "sources": [
+    {
+      "repository": "https://github.com/hachimi-ai/dsh-aemeath",
+      "revision": "f58eef75dcadb5aeaee9e78542e7e1d9ba43f821",
+      "input": "assets/spritesheet.webp",
+      "usedRows": [9, 10, 11, 12, 13, 14]
+    },
+    {
+      "repository": "https://github.com/culture-flask/dsh-aemeath-pet",
+      "revision": "6a65470c1661c47acbd73da62de39c1b26822fe8",
+      "input": "assets/sources/*.gif"
+    }
+  ],
+  "mergedAtlasSha256": "fc13120174fcc2b73df97541cfbef4d0bd216351326c6b0e989d3aa466f4b7d8"
+}

@@ -1,0 +1,381 @@
+{
+  "cellWidth": 200,
+  "cellHeight": 208,
+  "columns": 8,
+  "frameCount": 126,
+  "actions": [
+    {
+      "id": "idle",
+      "label": "呼吸眨眼",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "durations": [
+        110,
+        110,
+        110,
+        110,
+        110,
+        110,
+        110,
+        110,
+        110,
+        110,
+        110,
+        110,
+        110,
+        110,
+        110,
+        110
+      ],
+      "source": "culture-flask/dsh-aemeath-pet:d86375e80e538cc18e018871945f8d8d572486169.gif"
+    },
+    {
+      "id": "walk-right",
+      "label": "向右走走",
+      "frames": [
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23
+      ],
+      "durations": [
+        110,
+        110,
+        110,
+        110,
+        110,
+        110,
+        110,
+        110
+      ],
+      "source": "culture-flask/dsh-aemeath-pet:455f181e124b58181ff2810872eb3c9a572486169.gif"
+    },
+    {
+      "id": "walk-left",
+      "label": "向左走走",
+      "frames": [
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31
+      ],
+      "durations": [
+        110,
+        110,
+        110,
+        110,
+        110,
+        110,
+        110,
+        110
+      ],
+      "source": "culture-flask/dsh-aemeath-pet:mirrored-walk"
+    },
+    {
+      "id": "wave",
+      "label": "打个招呼",
+      "frames": [
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39
+      ],
+      "durations": [
+        110,
+        110,
+        110,
+        110,
+        110,
+        110,
+        110,
+        110
+      ],
+      "source": "culture-flask/dsh-aemeath-pet:24a4bbf14f1d1c8e3cec517705fb5e49572486169.gif"
+    },
+    {
+      "id": "jump",
+      "label": "开心蹦跳",
+      "frames": [
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47
+      ],
+      "durations": [
+        110,
+        110,
+        110,
+        110,
+        110,
+        110,
+        110,
+        110
+      ],
+      "source": "culture-flask/dsh-aemeath-pet:53a58a2689578bdef176171a594d2529572486169.gif"
+    },
+    {
+      "id": "ponder",
+      "label": "困惑冒泡",
+      "frames": [
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72
+      ],
+      "durations": [
+        110,
+        110,
+        110,
+        110,
+        110,
+        110,
+        110,
+        110,
+        110,
+        110,
+        110,
+        110,
+        110,
+        110,
+        110,
+        110,
+        110,
+        110,
+        110,
+        110,
+        110,
+        110,
+        110,
+        110,
+        110
+      ],
+      "source": "culture-flask/dsh-aemeath-pet:216d4f2d2c9ef9122c3907f91b9eae8a572486169.gif"
+    },
+    {
+      "id": "groove",
+      "label": "墨镜摇摆",
+      "frames": [
+        73,
+        74,
+        75,
+        76,
+        77,
+        78,
+        79
+      ],
+      "durations": [
+        110,
+        110,
+        110,
+        110,
+        110,
+        110,
+        110
+      ],
+      "source": "culture-flask/dsh-aemeath-pet:1a05d5b6dadb6405687b1c91b5cb9ff7572486169.gif"
+    },
+    {
+      "id": "happy",
+      "label": "开心摆手",
+      "frames": [
+        80,
+        81,
+        82,
+        83,
+        84,
+        85,
+        86,
+        87
+      ],
+      "durations": [
+        180,
+        180,
+        180,
+        180,
+        180,
+        180,
+        180,
+        180
+      ],
+      "source": "hachimi-ai/dsh-aemeath:row-9"
+    },
+    {
+      "id": "blush",
+      "label": "害羞眨眼",
+      "frames": [
+        88,
+        89,
+        90,
+        91,
+        92,
+        93,
+        94,
+        89
+      ],
+      "durations": [
+        180,
+        180,
+        180,
+        180,
+        180,
+        180,
+        180,
+        180
+      ],
+      "source": "hachimi-ai/dsh-aemeath:row-10"
+    },
+    {
+      "id": "look",
+      "label": "好奇张望",
+      "frames": [
+        95,
+        96,
+        97,
+        98,
+        99,
+        100,
+        101,
+        102
+      ],
+      "durations": [
+        180,
+        180,
+        180,
+        180,
+        180,
+        180,
+        180,
+        180
+      ],
+      "source": "hachimi-ai/dsh-aemeath:row-11"
+    },
+    {
+      "id": "daydream",
+      "label": "安静发呆",
+      "frames": [
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        104
+      ],
+      "durations": [
+        180,
+        180,
+        180,
+        180,
+        180,
+        180,
+        180,
+        180
+      ],
+      "source": "hachimi-ai/dsh-aemeath:row-12"
+    },
+    {
+      "id": "nap",
+      "label": "偷偷打盹",
+      "frames": [
+        110,
+        111,
+        112,
+        113,
+        114,
+        115,
+        116,
+        117
+      ],
+      "durations": [
+        180,
+        180,
+        180,
+        180,
+        180,
+        180,
+        180,
+        180
+      ],
+      "source": "hachimi-ai/dsh-aemeath:row-13"
+    },
+    {
+      "id": "peek",
+      "label": "开心冒头",
+      "frames": [
+        118,
+        119,
+        120,
+        121,
+        122,
+        123,
+        124,
+        125
+      ],
+      "durations": [
+        180,
+        180,
+        180,
+        180,
+        180,
+        180,
+        180,
+        180
+      ],
+      "source": "hachimi-ai/dsh-aemeath:row-14"
+    }
+  ]
+}

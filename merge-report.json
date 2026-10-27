@@ -1,0 +1,23 @@
+{
+  "actionCount": 13,
+  "uniqueStoredFrames": 126,
+  "sequenceFrames": 128,
+  "removedExactActions": [],
+  "semanticAliases": {
+    "culture:failed": "ponder",
+    "culture:waiting": "ponder",
+    "culture:review": "ponder",
+    "culture:look-front": "idle",
+    "culture:look-back": "idle",
+    "hachimi:idle": "idle",
+    "hachimi:running-right": "walk-right",
+    "hachimi:running-left": "walk-left",
+    "hachimi:waving": "wave",
+    "hachimi:jumping": "jump"
+  },
+  "atlasSize": [
+    1600,
+    3328
+  ],
+  "atlasSha256": "fc13120174fcc2b73df97541cfbef4d0bd216351326c6b0e989d3aa466f4b7d8"
+}
