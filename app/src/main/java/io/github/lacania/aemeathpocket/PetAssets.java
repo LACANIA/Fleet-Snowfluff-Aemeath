@@ -10,6 +10,8 @@ import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 /** 素材只解码一次，预览和悬浮窗共享；文件来自可重建的本地图集。 */
 final class PetAssets {
@@ -31,21 +33,24 @@ final class PetAssets {
             return frames[frames.length-1];
         }
     }
-    private static PetAssets instance;
+    private static final Map<String,PetAssets> instances=new HashMap<>();
     final Bitmap bitmap;
     final List<Action> actions=new ArrayList<>();
     final int width,height,columns;
     static synchronized PetAssets get(Context context) {
-        if(instance==null) instance=new PetAssets(context.getApplicationContext());
-        return instance;
+        return get(context,"aemeath");
     }
-    private PetAssets(Context context) {
+    static synchronized PetAssets get(Context context,String characterId){
+        PetCatalog.Character character=PetCatalog.get(context,characterId);PetAssets found=instances.get(character.id);
+        if(found==null){found=new PetAssets(context.getApplicationContext(),character);instances.put(character.id,found);}return found;
+    }
+    private PetAssets(Context context,PetCatalog.Character character) {
         try {
-            JSONObject data=new JSONObject(read(context,"animations.json"));
+            JSONObject data=new JSONObject(read(context,character.animations));
             width=data.getInt("cellWidth");height=data.getInt("cellHeight");columns=data.getInt("columns");
             JSONArray list=data.getJSONArray("actions");
             for(int i=0;i<list.length();i++)actions.add(new Action(list.getJSONObject(i)));
-            try(InputStream input=context.getAssets().open("pet-atlas.png")){bitmap=BitmapFactory.decodeStream(input);}
+            try(InputStream input=context.getAssets().open(character.atlas)){bitmap=BitmapFactory.decodeStream(input);}
             if(bitmap==null)throw new IllegalStateException("Cannot decode pet atlas");
         }catch(Exception error){throw new IllegalStateException("Cannot load local pet assets",error);}
     }

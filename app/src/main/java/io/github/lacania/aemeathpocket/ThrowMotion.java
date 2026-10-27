@@ -54,5 +54,14 @@ public final class ThrowMotion {
     public boolean isActive(){return active;}
     public int x(){return (int)Math.round(x);}
     public int y(){return (int)Math.round(y);}
+    public double velocityX(){return vx;}
+    public double velocityY(){return vy;}
+    public void collision(double x,double y,double vx,double vy,int minX,int maxX,int minY,int maxY,double density,PhysicsOptions options){
+        if(!Double.isFinite(x)||!Double.isFinite(y)||!Double.isFinite(vx)||!Double.isFinite(vy))return;
+        boolean wasActive=active;double previousElapsed=elapsed;
+        start(x,y,vx,vy,minX,maxX,minY,maxY,density,options);
+        active=wasActive||Math.hypot(this.vx,this.vy)>=15*scale;
+        elapsed=wasActive?previousElapsed:0;
+    }
     private static double clamp(double value,double low,double high){return Math.max(low,Math.min(value,high));}
 }

@@ -1,0 +1,47 @@
+{
+  "source": "https://github.com/llors-chen/Feibi_desktop",
+  "revision": "99750437de188ddaa3430cc6fffb9c991f906806",
+  "uniqueFrames": 337,
+  "atlasSize": [
+    2880,
+    2720
+  ],
+  "decodedBytes": 31334400,
+  "actions": [
+    {
+      "file": "idle.gif",
+      "sha256": "c0a834e3f5bcaff7ada69f717eb922e8553a506ca1be3b39a5bcf5bb37e19631",
+      "originalFrames": 96,
+      "storedSequenceFrames": 49,
+      "totalDurationMs": 4850
+    },
+    {
+      "file": "push.gif",
+      "sha256": "448168d7d734d553c664958f250edc992d8ff12006393b846cb9b21c11bd412a",
+      "originalFrames": 190,
+      "storedSequenceFrames": 96,
+      "totalDurationMs": 9550
+    },
+    {
+      "file": "eating.gif",
+      "sha256": "c20cdd71d08906c0a848eec9e72f5c688e56f01e690e90c3de7e71f70f554d7c",
+      "originalFrames": 117,
+      "storedSequenceFrames": 60,
+      "totalDurationMs": 6050
+    },
+    {
+      "file": "talk.gif",
+      "sha256": "b9ddeba277fccc4f6196857569ef1a2678e96549265e4f5c13e44e894d6d800d",
+      "originalFrames": 95,
+      "storedSequenceFrames": 48,
+      "totalDurationMs": 4850
+    },
+    {
+      "file": "sleep.gif",
+      "sha256": "c603a98ba071599b2dbaef98031352c86a562408727c07661e22b1f3a44f629e",
+      "originalFrames": 166,
+      "storedSequenceFrames": 84,
+      "totalDurationMs": 8350
+    }
+  ]
+}

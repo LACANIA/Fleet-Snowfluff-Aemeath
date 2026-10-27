@@ -16,7 +16,8 @@ final class PetView extends View {
     private long started;
     private boolean looping=true,active=true;
     private final Runnable tick=new Runnable(){public void run(){if(active&&isAttachedToWindow()&&getVisibility()==VISIBLE){invalidate();postDelayed(this,50);}}};
-    PetView(Context context){super(context);assets=PetAssets.get(context);paint.setFilterBitmap(false);play("idle",true);setContentDescription("爱弥斯，原地长按后松手打开菜单，按住拖动可换位置");}
+    PetView(Context context){this(context,"aemeath");}
+    PetView(Context context,String characterId){super(context);assets=PetAssets.get(context,characterId);paint.setFilterBitmap(false);play("idle",true);setContentDescription(PetCatalog.get(context,characterId).name+"，原地长按后松手打开菜单，按住拖动可换位置");}
     void play(String id,boolean loop){action=assets.action(id);looping=loop;started=SystemClock.uptimeMillis();invalidate();}
     void active(boolean value){active=value;removeCallbacks(tick);if(value&&isAttachedToWindow())post(tick);}
     @Override protected void onAttachedToWindow(){super.onAttachedToWindow();removeCallbacks(tick);if(active)post(tick);}

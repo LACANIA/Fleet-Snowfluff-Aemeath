@@ -1,10 +1,10 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="io.github.lacania.aemeathpocket" android:versionCode="4" android:versionName="0.1.3">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="io.github.lacania.aemeathpocket" android:versionCode="5" android:versionName="0.2.0">
     <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="35" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <application android:label="爱弥斯口袋桌宠" android:theme="@android:style/Theme.Material.Light.NoActionBar" android:icon="@drawable/pet_icon" android:allowBackup="false" android:supportsRtl="true">
+    <application android:label="飞行雪绒" android:theme="@android:style/Theme.Material.Light.NoActionBar" android:icon="@drawable/pet_icon" android:allowBackup="false" android:supportsRtl="true">
         <activity android:name=".MainActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

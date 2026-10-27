@@ -26,3 +26,6 @@ __pycache__/
 Thumbs.db
 .idea/
 .vscode/
+
+# Optional local character catalog overrides
+/app/src/main/assets/characters-local.json

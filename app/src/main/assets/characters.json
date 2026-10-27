@@ -1,0 +1,56 @@
+{
+  "characters": [
+    {
+      "id": "aemeath",
+      "name": "爱弥斯",
+      "animations": "animations.json",
+      "atlas": "pet-atlas.png",
+      "chatter": "chatter.json",
+      "body": [
+        0.2,
+        0.12,
+        0.8,
+        0.96
+      ]
+    },
+    {
+      "id": "phoebe",
+      "name": "菲比",
+      "animations": "characters/phoebe/animations.json",
+      "atlas": "characters/phoebe/pet-atlas.png",
+      "chatter": "",
+      "body": [
+        0.22,
+        0.14,
+        0.78,
+        0.96
+      ]
+    },
+    {
+      "id": "shorekeeper",
+      "name": "守岸人",
+      "animations": "characters/shorekeeper/animations.json",
+      "atlas": "characters/shorekeeper/pet-atlas.png",
+      "chatter": "",
+      "body": [
+        0.2,
+        0.12,
+        0.8,
+        0.96
+      ]
+    },
+    {
+      "id": "phrolova",
+      "name": "弗洛洛",
+      "animations": "characters/phrolova/animations.json",
+      "atlas": "characters/phrolova/pet-atlas.png",
+      "chatter": "",
+      "body": [
+        0.2,
+        0.12,
+        0.8,
+        0.96
+      ]
+    }
+  ]
+}

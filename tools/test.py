@@ -16,8 +16,8 @@ def executable(name):
     return found
 
 out=project/'build/test-classes';out.mkdir(parents=True,exist_ok=True)
-sources=[project/'app/src/main/java/io/github/lacania/aemeathpocket'/name for name in ['Motion.java','PetGesture.java','ThrowMotion.java','ThrowTrail.java','PhysicsOptions.java','SpeechPlacement.java']]
+sources=[project/'app/src/main/java/io/github/lacania/aemeathpocket'/name for name in ['Motion.java','PetGesture.java','ThrowMotion.java','ThrowTrail.java','PhysicsOptions.java','SpeechPlacement.java','PetPacking.java','PetCollision.java','OverlayOpacity.java']]
 sources+=list((project/'tests').glob('*.java'))
 subprocess.run([executable('javac'),'-encoding','UTF-8','--release','8','-d',str(out),*map(str,sources)],check=True)
-for name in ['MotionTest','GestureTest','ThrowMotionTest','ThrowTrailTest','PhysicsOptionsTest','SpeechPlacementTest']:
+for name in ['MotionTest','GestureTest','ThrowMotionTest','ThrowTrailTest','PhysicsOptionsTest','SpeechPlacementTest','MultiPetTest']:
     subprocess.run([executable('java'),'-cp',str(out),name],check=True)
