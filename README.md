@@ -2,11 +2,13 @@
 
 一只可以陪你使用手机、看视频和玩游戏的安卓悬浮桌宠，使用《鸣潮》爱弥斯的像素动画。本项目是独立的本地安卓应用，关闭设置页面后，桌宠仍然显示在其他应用上方。
 
-**当前版本：0.1.2 个人测试版，支持 Android 8.0 及以上。** 无需 DSH、Codex 或 AI 接口，应用没有申请网络权限。
+**当前版本：0.1.3 个人测试版，支持 Android 8.0 及以上。** 无需 DSH、Codex 或 AI 接口，应用没有申请网络权限。
+
+[下载 v0.1.3 安卓安装包](https://github.com/LACANIA/aemeath-pocket/releases/download/v0.1.3/Aemeath-Pocket-0.1.3-test.apk) · [版本说明与历史安装包](https://github.com/LACANIA/aemeath-pocket/releases)
 
 ## 安装与使用
 
-1. 从 [Releases](https://github.com/LACANIA/aemeath-pocket/releases) 下载 `Aemeath-Pocket-0.1.2-test.apk`，在安卓手机上安装。
+1. 从 [Releases](https://github.com/LACANIA/aemeath-pocket/releases) 下载 `Aemeath-Pocket-0.1.3-test.apk`，在安卓手机上安装。
 2. 打开应用，点击“让爱弥斯出来”，按提示允许显示悬浮窗；Android 13 及以上建议同时允许通知。
 3. 返回桌面或打开其他应用。按住宠物拖动可以换位置；默认松手停止，应用内开启“拖拽抛射”后，快速拖动松手会惯性飞出并在屏幕边缘弹跳，速度逐渐减小。再次按住可以停止，关闭开关也会停止抛射。
 4. 原地按住约 **0.6 秒后松手**，打开动作菜单。短按、拖动、拖动后返回原位都不会打开菜单；原地按住后再开始拖动，也按拖动处理。
@@ -39,6 +41,12 @@
 
 可以回到应用关闭“点击穿透”，或者在允许通知的情况下，通过桌宠通知里的“恢复触控”恢复操作。具体游戏和手机系统是否允许悬浮显示，需要在自己的设备上试用。
 
+### 偶尔说一句话
+
+“随机小气泡”默认关闭。开启后，待机时约每 45–90 秒出现一句短话，每次约 4.5 秒；部分手动动作和抛射结束时也有对应的小反应。设置里的“看看台词气泡”可以立即预览。
+
+台词存放在 `app/src/main/assets/chatter.json`，两条游戏语音短句和原创二创文案分别标注，均在本地选取，无需 AI 或网络。气泡始终点击穿透，不与宠物窗口重叠，避免影响游戏；没有合适显示位置时隐藏。拖动、展开菜单、锁屏和旋转时也会收起。
+
 ## 动作与界面
 
 包含 13 个动作条目：呼吸眨眼、向右走走、向左走走、打个招呼、开心蹦跳、困惑冒泡、墨镜摇摆、开心摆手、害羞眨眼、好奇张望、安静发呆、偷偷打盹、开心冒头。其中左右走动分别列出，整合后保存 126 个唯一透明帧。
@@ -57,7 +65,7 @@
 - 抛射速度估算、边缘反弹和 96 组边界轨迹用例；模拟器实测独立开关、慢速放下、快速甩动、反弹、飞行结束与设置保存。
 - 四项滑块修改与重启后保留、一键恢复默认、参数面板旋转后恢复；飞行中旋转会中断旧轨迹，新抛射朝当前画面下边缘落下。
 - 四个屏幕角落的菜单位置、动作列表滚动、关闭设置页后继续显示，以及退出时结束服务。
-- 宠物覆盖另一应用的“显示”入口，开启穿透后可以点击进入下面的系统设置页面，关闭开关后恢复宠物触控。
+- 使用不同 Android 用户标识的独立测试页面，确认宠物和气泡实际可见时，覆盖位置的按钮仍能收到点击；关闭宠物穿透开关后恢复宠物触控。
 
 模拟器无法展开通知栏或进入真实休眠，因此**通知栏恢复触控、锁屏暂停，以及实体手机和其他 Android 版本仍需验证**。当前安装包使用个人测试证书，不属于应用商店正式版本。
 
@@ -73,7 +81,7 @@ export ANDROID_HOME=/path/to/android-sdk
 python3 tools/build.py
 ```
 
-输出为 `dist/Aemeath-Pocket-0.1.2-test.apk`。首次构建会在本机生成 `tools/personal-test.keystore`，只用于个人测试；该文件不会提交到仓库。同一设备继续覆盖安装时需要使用相同证书，请自行备份本机证书。重新生成证书的安装包无法直接覆盖使用旧证书的安装包。
+输出为 `dist/Aemeath-Pocket-0.1.3-test.apk`。首次构建会在本机生成 `tools/personal-test.keystore`，只用于个人测试；该文件不会提交到仓库。同一设备继续覆盖安装时需要使用相同证书，请自行备份本机证书。重新生成证书的安装包无法直接覆盖使用旧证书的安装包。
 
 也可以使用本地隔离工具目录：已有的 `tools/prepare-toolchain.sh`、`tools/prepare-sdk.py` 用于本项目早期 Ubuntu 测试环境，其特定 JDK 包版本取决于发行版软件源是否仍然提供。日常构建建议通过上面的环境变量指定自己安装的 JDK 与 SDK。
 
@@ -85,7 +93,9 @@ python3 tools/verify-assets.py
 python3 tools/test.py
 ```
 
-模拟器交互脚本会操作选定设备的界面，只应在专门的测试模拟器运行。通过 `ADB` 指定 adb 路径、`ANDROID_SERIAL` 指定设备，再运行 `tools/compact-menu-test.py` 或 `tools/click-through-test.py`。后者针对中文 Android 设置页面；`tools/rotation-test.py` 额外需要 `MUMU_MANAGER` 指向 MuMuManager。
+模拟器交互脚本会操作选定设备的界面，只应在专门的测试模拟器运行。通过 `ADB` 指定 adb 路径、`ANDROID_SERIAL` 指定设备。`tools/compact-menu-test.py` 检查菜单；`tools/physics-panel-test.py` 检查参数和旋转，额外需要 `MUMU_MANAGER` 指向 MuMuManager。
+
+点击穿透检查使用独立的测试应用，而非会主动隐藏悬浮窗的系统设置页面。先运行 `python3 tools/build-probe.py`，将 `build/overlay-probe/probe.apk` 安装到测试模拟器，再运行 `tools/click-through-test.py` 或 `tools/speech-test.py`；后者也使用 MuMu 旋转工具。该测试应用没有网络或其他权限，不随桌宠发行版提供，检查完毕可以卸载 `io.github.lacania.overlayprobe`。
 
 ### 重新整合素材
 

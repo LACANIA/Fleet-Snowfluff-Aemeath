@@ -18,6 +18,14 @@ for action in config['actions']:
         assert frame.getchannel('A').getbbox() is not None,(action['id'],index,'blank frame')
 assert {'idle','walk-left','walk-right','wave','nap'}.issubset(ids)
 assert sheet.getpixel((0,0))[3]==0,'Atlas must retain a transparent background'
+chatter=json.loads((assets/'chatter.json').read_text(encoding='utf-8'))
+line_ids=set()
+for line in chatter['lines']:
+    assert line['id'] not in line_ids
+    line_ids.add(line['id'])
+    assert 0<len(line['text'])<=32
+    assert line['kind'] in ['game-voice','fan-written']
+    assert line['context'] in ['idle','look','wave','nap','groove','throw']
 manifest=ET.parse(project/'app/src/main/AndroidManifest.xml').getroot()
 ns='{http://schemas.android.com/apk/res/android}'
 permissions=[item.attrib[ns+'name'] for item in manifest.findall('uses-permission')]

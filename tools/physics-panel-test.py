@@ -15,12 +15,21 @@ def locate(predicate):
             if node is not None:return node
             listing=next((n for n in root.iter('node') if n.get('scrollable')=='true'),None)
             if listing is None:break
-            l,t,r,b=rect(listing);x=(l+r)//2;lo=t+(b-t)//4;hi=b-(b-t)//4
+            l,t,r,b=rect(listing);x=r-30;lo=t+(b-t)//4;hi=b-(b-t)//4
+            try:
+                pl,pt,pr,pb=bounds()[0]
+                x=next((candidate for candidate in [l+30,r-30,(l+r)//2] if candidate<pl or candidate>pr),x)
+            except AssertionError:pass
             shell('input','swipe',str(x),str(hi if direction==1 else lo),str(x),str(lo if direction==1 else hi),'240')
     raise AssertionError('Control not found')
 def rect(node):return tuple(map(int,re.findall(r'\d+',node.get('bounds'))))
 def tap_node(node):
-    l,t,r,b=rect(node);shell('input','tap',str((l+r)//2),str((t+b)//2));time.sleep(.2)
+    l,t,r,b=rect(node);x,y=(l+r)//2,(t+b)//2
+    try:
+        pl,pt,pr,pb=bounds()[0]
+        if pl<=x<=pr and pt<=y<=pb:x=next((candidate for candidate in [l+20,r-20] if candidate<pl or candidate>pr),x)
+    except AssertionError:pass
+    shell('input','tap',str(x),str(y));time.sleep(.2)
 def button(label):tap_node(locate(lambda n:n.get('text')==label))
 def caption(prefix):return locate(lambda n:n.get('text','').startswith(prefix+' · ')).get('text')
 def setting(label,value):

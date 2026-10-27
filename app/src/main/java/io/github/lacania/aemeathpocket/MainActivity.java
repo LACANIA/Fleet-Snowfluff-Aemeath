@@ -34,7 +34,7 @@ public final class MainActivity extends Activity {
     private PetView preview;
     private TextView status,sizeLabel;
     private boolean awaitingOverlay;
-    private Switch roaming,passing,throwing;
+    private Switch roaming,passing,throwing,chattering;
     private LinearLayout physicsPanel;
     private Button physicsToggle;
     private boolean physicsExpanded;
@@ -77,6 +77,10 @@ public final class MainActivity extends Activity {
         passing=new Switch(this);passing.setText("点击穿透");passing.setTextColor(INK);passing.setTextSize(16);passing.setPadding(0,dp(10),0,dp(10));root.addView(passing);
         passing.setChecked(prefs.getBoolean("pass",false));passing.setOnCheckedChangeListener((button,checked)->prefs.edit().putBoolean("pass",checked).apply());
         text(root,"开启后爱弥斯会变淡，不响应点击或拖动，操作直接交给下层游戏。允许通知后，可从通知栏恢复触控，也可回到这里关闭。",12,MUTED,false);
+        chattering=new Switch(this);chattering.setText("随机小气泡");chattering.setTextColor(INK);chattering.setTextSize(16);chattering.setPadding(0,dp(10),0,dp(10));root.addView(chattering);
+        chattering.setChecked(prefs.getBoolean("chatter",false));chattering.setOnCheckedChangeListener((button,checked)->prefs.edit().putBoolean("chatter",checked).apply());
+        text(root,"偶尔说一句短短的话，每次约 4 秒，间隔约 45–90 秒。气泡不会拦截触摸，可以随时关闭。",12,MUTED,false);
+        Button previewChatter=button("看看台词气泡",false);root.addView(previewChatter,new LinearLayout.LayoutParams(-1,dp(44)));previewChatter.setOnClickListener(view->{if(PetService.running)startService(new Intent(this,PetService.class).setAction(PetService.SAY));else toast("先让爱弥斯出来，再看看气泡吧");});
         sizeLabel=text(root,"",15,INK,false);margin(sizeLabel,18,0);
         SeekBar size=new SeekBar(this);size.setMax(120);size.setProgress(prefs.getInt("size",128)-72);sizeLabel.setText("宠物大小 · "+prefs.getInt("size",128));root.addView(size);
         size.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){
@@ -89,7 +93,7 @@ public final class MainActivity extends Activity {
         });
         TextView help=text(root,"原地按住宠物约 0.6 秒，松手打开动作菜单；按住拖动可以换位置。\n关闭这个设置页后，宠物会继续显示；锁屏时暂停动画。",13,MUTED,false);help.setLineSpacing(dp(4),1);margin(help,20,10);
         Button about=button("素材来源与说明",false);root.addView(about,new LinearLayout.LayoutParams(-1,dp(44)));about.setOnClickListener(view->about());
-        text(root,"个人测试版 0.1.2 · 本地运行",12,MUTED,false);
+        text(root,"个人测试版 0.1.3 · 本地运行",12,MUTED,false);
         setContentView(scroll);refresh();
     }
     private void requestStart(){
@@ -139,6 +143,7 @@ public final class MainActivity extends Activity {
         if(status!=null)status.setText(!Settings.canDrawOverlays(this)?"首次使用需要允许显示悬浮窗":PetService.running&&prefs.getBoolean("enabled",false)?"爱弥斯已经在屏幕上了":"准备好时，叫她出来陪伴你");
         if(roaming!=null)roaming.setChecked(prefs.getBoolean("roam",true));if(passing!=null)passing.setChecked(prefs.getBoolean("pass",false));
         if(throwing!=null)throwing.setChecked(prefs.getBoolean("throw",false));
+        if(chattering!=null)chattering.setChecked(prefs.getBoolean("chatter",false));
     }
     private void gallery(){
         PetAssets assets=PetAssets.get(this);String[] labels=new String[assets.actions.size()];for(int i=0;i<labels.length;i++)labels[i]=assets.actions.get(i).label;

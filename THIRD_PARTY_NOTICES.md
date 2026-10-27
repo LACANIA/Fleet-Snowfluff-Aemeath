@@ -19,3 +19,7 @@
 `ThrowTrail.java` 和 `ThrowMotion.java` 移植自 [PC2005-cloud/dsh-pet](https://github.com/PC2005-cloud/dsh-pet) 的 `dsh-pet/src/shared/physics.ts`，参考版本为 `932de8a80951f9bd8beeb87fd05f129b52586b3e`。复用轨迹采样、松手速度估算、软限速、重力、边缘反弹、地面摩擦和积分细分；安卓部分增加 dp 单位换算、完整窗口边界限制、中断和开关。
 
 Copyright (c) 2026 PC2005-cloud，MIT 许可全文保留在 [DSH-PET-MIT.txt](app/src/main/assets/DSH-PET-MIT.txt)，并随安装包提供。没有引入 DSH 的 AI、任务状态、余额或网络连接。
+
+## 气泡短句
+
+`app/src/main/assets/chatter.json` 区分 `game-voice` 与 `fan-written`。两条游戏语音短句参考 [爱弥斯故事和语音整理页](https://genshin-builds.com/cn/wuthering-waves/characters/aemeath/info)，相关游戏文本权利归相应权利方所有；其余为本项目原创二创文案。没有包含官方语音音频，也没有运行时 AI 文本生成。代码许可不对原始游戏台词授予额外权利。

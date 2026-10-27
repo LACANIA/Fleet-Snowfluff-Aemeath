@@ -1,0 +1,15 @@
+{
+  "description": "Two short game voice lines and original fan-written phrases. No generated dialogue at runtime.",
+  "gameTextReference": "https://genshin-builds.com/cn/wuthering-waves/characters/aemeath/info",
+  "lines": [
+    {"id":"visible","text":"你，看见我了？","context":"idle","kind":"game-voice","voice":"初奏"},
+    {"id":"look","text":"看这里~","context":"look","kind":"game-voice","voice":"闲趣·二"},
+    {"id":"wait","text":"等你忙完。","context":"idle","kind":"fan-written"},
+    {"id":"still-here","text":"我在这里，没走哦。","context":"idle","kind":"fan-written"},
+    {"id":"peek","text":"偷偷看你一眼。","context":"look","kind":"fan-written"},
+    {"id":"wave","text":"这边，这边～","context":"wave","kind":"fan-written"},
+    {"id":"nap","text":"让我歇一会儿嘛。","context":"nap","kind":"fan-written"},
+    {"id":"sway","text":"稍微晃一晃～","context":"groove","kind":"fan-written"},
+    {"id":"throw","text":"这次轻一点呀。","context":"throw","kind":"fan-written"}
+  ]
+}

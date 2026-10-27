@@ -45,7 +45,7 @@ def bounds():
         if match:
             rectangle=tuple(map(int,match.groups()));candidates.append((rectangle,block))
     if not candidates:raise AssertionError('Pet overlay window missing')
-    return min(candidates,key=lambda item:(item[0][2]-item[0][0])*(item[0][3]-item[0][1]))
+    return next((item for item in candidates if 'AemeathPet' in item[1]),min(candidates,key=lambda item:(item[0][2]-item[0][0])*(item[0][3]-item[0][1])))
 def check_bounds(label):
     rectangle,block=bounds();width,height=screen();left,top,right,bottom=rectangle
     assert 0<=left<right<=width and 0<=top<bottom<=height,(label,rectangle,(width,height))

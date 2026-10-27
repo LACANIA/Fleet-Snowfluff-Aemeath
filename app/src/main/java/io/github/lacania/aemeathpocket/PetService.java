@@ -44,11 +44,15 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 /** 独立前台悬浮窗：Activity 关闭后继续运行，用户退出或权限撤销时清理所有窗口。 */
 public final class PetService extends Service implements SharedPreferences.OnSharedPreferenceChangeListener {
-    public static final String STOP="pet.stop", PLAY="pet.play", PASS="pet.pass", HOME="pet.home";
+    public static final String STOP="pet.stop", PLAY="pet.play", PASS="pet.pass", HOME="pet.home",SAY="pet.say";
     public static volatile boolean running;
     private static final String CHANNEL="pet_presence";
     private final Handler handler=new Handler(Looper.getMainLooper());
@@ -58,6 +62,11 @@ public final class PetService extends Service implements SharedPreferences.OnSha
     private WindowManager.LayoutParams layout;
     private PetView pet;
     private Dialog menu;
+    private TextView bubble;
+    private WindowManager.LayoutParams bubbleLayout;
+    private JSONArray chatter=new JSONArray();
+    private long nextChatter,bubbleUntil,lastChatter;
+    private int lastLine=-1;
     private final PetGesture gesture=new PetGesture();
     private final ThrowMotion fling=new ThrowMotion();
     private final ThrowTrail trail=new ThrowTrail();
@@ -74,9 +83,11 @@ public final class PetService extends Service implements SharedPreferences.OnSha
         if(!Settings.canDrawOverlays(PetService.this)){stopSelf();return;}
         long now=SystemClock.uptimeMillis();
         double dt=Math.min(.1,Math.max(0,(now-lastTick)/1000.0));lastTick=now;
+        if(bubble!=null&&now>=bubbleUntil)hideBubble();
+        if(prefs.getBoolean("chatter",false)&&!pressed&&menu==null&&!fling.isActive()&&now>=nextChatter)showChatter("idle",false);
         if(fling.isActive()){
             boolean moving=fling.step(dt);layout.x=fling.x();layout.y=fling.y();updateWindow();
-            if(!moving){savePosition();pet.play("idle",true);nextAction=now+5000;}
+            if(!moving){savePosition();pet.play("idle",true);nextAction=now+5000;showChatter("throw",false);}
             handler.postDelayed(this,16);return;
         }
         if(!pressed&&menu==null&&manualUntil!=0&&now>=manualUntil){manualUntil=0;pet.play("idle",true);}
@@ -112,6 +123,8 @@ public final class PetService extends Service implements SharedPreferences.OnSha
     };
     @Override public void onCreate(){
         super.onCreate();prefs=getSharedPreferences("pet",MODE_PRIVATE);windows=(WindowManager)getSystemService(WINDOW_SERVICE);
+        try{chatter=new JSONObject(PetAssets.read(this,"chatter.json")).getJSONArray("lines");}catch(Exception ignored){}
+        nextChatter=SystemClock.uptimeMillis()+15000;
         NotificationManager manager=getSystemService(NotificationManager.class);
         manager.createNotificationChannel(new NotificationChannel(CHANNEL,"桌宠运行",NotificationManager.IMPORTANCE_LOW));
         prefs.registerOnSharedPreferenceChangeListener(this);
@@ -133,6 +146,7 @@ public final class PetService extends Service implements SharedPreferences.OnSha
                 layout=new WindowManager.LayoutParams(1,1,WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
                     WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE|WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL|WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,PixelFormat.TRANSLUCENT);
                 layout.gravity=Gravity.TOP|Gravity.LEFT;
+                layout.setTitle("AemeathPet");
                 if(Build.VERSION.SDK_INT>=30)layout.setFitInsetsTypes(0);
                 pet.setOnTouchListener(this::touch);
                 pet.setOnLongClickListener(view->{showMenu();return true;});
@@ -143,6 +157,7 @@ public final class PetService extends Service implements SharedPreferences.OnSha
             if(PLAY.equals(action)){play(intent.getStringExtra("animation"));}
             else if(PASS.equals(action)){prefs.edit().putBoolean("pass",!prefs.getBoolean("pass",false)).apply();}
             else if(HOME.equals(action)){cancelThrow();prefs.edit().putFloat("x",.85f).putFloat("y",.65f).apply();moveUntil=0;applyLayout();}
+            else if(SAY.equals(action))showChatter("idle",true);
         }catch(RuntimeException error){
             Toast.makeText(this,"桌宠暂时无法显示，请重新检查悬浮窗权限",Toast.LENGTH_LONG).show();stopSelf();return START_NOT_STICKY;
         }
@@ -185,7 +200,7 @@ public final class PetService extends Service implements SharedPreferences.OnSha
         updateWindow();
         positionMenu();
     }
-    private void updateWindow(){if(pet!=null&&pet.isAttachedToWindow()){try{windows.updateViewLayout(pet,layout);}catch(IllegalArgumentException|SecurityException error){stopSelf();}}}
+    private void updateWindow(){if(pet!=null&&pet.isAttachedToWindow()){try{windows.updateViewLayout(pet,layout);positionBubble();}catch(IllegalArgumentException|SecurityException error){stopSelf();}}}
     private void savePosition(){prefs.edit().putFloat("x",Motion.fraction(layout.x,minX,maxX)).putFloat("y",Motion.fraction(layout.y,minY,maxY)).apply();}
     private void cancelThrow(){
         if(fling.isActive()){fling.stop();if(layout!=null)savePosition();if(pet!=null)pet.play("idle",true);nextAction=SystemClock.uptimeMillis()+5000;}
@@ -200,6 +215,7 @@ public final class PetService extends Service implements SharedPreferences.OnSha
     private boolean touch(View view,MotionEvent event){
         switch(event.getActionMasked()){
             case MotionEvent.ACTION_DOWN:
+                hideBubble();
                 cancelThrow();recycleVelocity();trackVelocity(event);
                 pressed=true;dragging=false;downX=event.getRawX();downY=event.getRawY();originX=layout.x;originY=layout.y;moveUntil=0;manualUntil=0;
                 gesture.begin(event.getEventTime(),downX,downY,ViewConfiguration.get(this).getScaledTouchSlop());
@@ -241,12 +257,46 @@ public final class PetService extends Service implements SharedPreferences.OnSha
             direction="walk-right".equals(action.id)?1:-1;motionX=layout.x;manualUntil=0;moveUntil=now+2400;nextAction=moveUntil+3500;
         }else{manualUntil=now+Math.max(2500,action.total*3);nextAction=manualUntil+3000;}
         pet.play(action.id,true);
+        showChatter(action.id,false);
+    }
+    private void showChatter(String context,boolean preview){
+        long now=SystemClock.uptimeMillis();nextChatter=now+45000+random.nextInt(45001);
+        if(pet==null||paused||pressed||menu!=null||chatter.length()==0||(!preview&&!prefs.getBoolean("chatter",false))||(!preview&&now-lastChatter<12000))return;
+        List<Integer> matches=new ArrayList<>();
+        for(int i=0;i<chatter.length();i++){JSONObject item=chatter.optJSONObject(i);if(item!=null&&context.equals(item.optString("context")))matches.add(i);}
+        if(matches.isEmpty())return;
+        if(matches.size()>1)matches.remove(Integer.valueOf(lastLine));
+        int selected=matches.get(random.nextInt(matches.size()));String line=chatter.optJSONObject(selected).optString("text");
+        if(line.isEmpty()||line.length()>32)return;
+        hideBubble();TextView text=new TextView(this);text.setText(line);text.setTextSize(13);text.setTextColor(0xff45314e);text.setGravity(Gravity.CENTER);text.setMaxLines(2);text.setPadding(dp(10),dp(8),dp(10),dp(8));
+        text.setContentDescription("爱弥斯的小气泡："+line);
+        GradientDrawable background=new GradientDrawable();background.setColor(0xfffff6fb);background.setCornerRadius(dp(13));background.setStroke(dp(1),0xffdcc4d4);text.setBackground(background);
+        text.measure(View.MeasureSpec.makeMeasureSpec(Math.min(dp(180),maxX+layout.width-minX),View.MeasureSpec.AT_MOST),View.MeasureSpec.makeMeasureSpec(dp(76),View.MeasureSpec.AT_MOST));
+        bubbleLayout=new WindowManager.LayoutParams(text.getMeasuredWidth(),text.getMeasuredHeight(),WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE|WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE|WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL|WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,PixelFormat.TRANSLUCENT);
+        bubbleLayout.gravity=Gravity.TOP|Gravity.LEFT;bubbleLayout.alpha=.75f;if(Build.VERSION.SDK_INT>=30)bubbleLayout.setFitInsetsTypes(0);
+        bubbleLayout.setTitle("AemeathSpeech");
+        int[] position=bubblePosition();if(position==null)return;bubbleLayout.x=position[0];bubbleLayout.y=position[1];
+        try{windows.addView(text,bubbleLayout);bubble=text;bubbleUntil=now+4500;lastChatter=now;lastLine=selected;}catch(IllegalArgumentException|SecurityException ignored){bubble=null;}
+    }
+    private int[] bubblePosition(){
+        if(layout==null||bubbleLayout==null)return null;
+        return SpeechPlacement.place(layout.x,layout.y,layout.width,layout.height,bubbleLayout.width,bubbleLayout.height,minX,minY,maxX+layout.width,maxY+layout.height,dp(6));
+    }
+    private void positionBubble(){
+        if(bubble==null)return;int[] position=bubblePosition();if(position==null){hideBubble();return;}
+        bubbleLayout.x=position[0];bubbleLayout.y=position[1];
+        try{windows.updateViewLayout(bubble,bubbleLayout);}catch(IllegalArgumentException|SecurityException ignored){hideBubble();}
+    }
+    private void hideBubble(){
+        if(bubble!=null){try{windows.removeView(bubble);}catch(IllegalArgumentException|SecurityException ignored){}bubble=null;}
+        bubbleUntil=0;
     }
     private PhysicsOptions physicsOptions(){
         return new PhysicsOptions(prefs.getFloat("physics.strength",1),prefs.getFloat("physics.elasticity",.78f),prefs.getFloat("physics.gravity",1400),prefs.getFloat("physics.friction",2.5f));
     }
     private void showMenu(){
         if(menu!=null||pet==null||!Settings.canDrawOverlays(this))return;
+        hideBubble();
         cancelThrow();
         ContextThemeWrapper theme=new ContextThemeWrapper(this,android.R.style.Theme_Material_Light_Dialog_Alert);
         Dialog panel=new Dialog(theme);panel.requestWindowFeature(Window.FEATURE_NO_TITLE);menu=panel;
@@ -266,7 +316,7 @@ public final class PetService extends Service implements SharedPreferences.OnSha
                 item.setLayoutParams(new android.widget.AbsListView.LayoutParams(-1,dp(44)));return item;
             }
         });
-        list.setOnItemClickListener((parent,view,position,id)->{play(PetAssets.get(this).actions.get(position).id);panel.dismiss();});
+        list.setOnItemClickListener((parent,view,position,id)->{panel.dismiss();play(PetAssets.get(this).actions.get(position).id);});
         root.addView(list,new LinearLayout.LayoutParams(-1,0,1));
         LinearLayout footer=new LinearLayout(theme);footer.setPadding(0,dp(6),0,0);
         String roamText=prefs.getBoolean("roam",true)?"暂停走动":"允许走动";
@@ -301,11 +351,13 @@ public final class PetService extends Service implements SharedPreferences.OnSha
         if(pet==null)return;
         boolean visible=getSystemService(PowerManager.class).isInteractive()&&!getSystemService(KeyguardManager.class).isKeyguardLocked();
         paused=!visible;pet.setVisibility(visible?View.VISIBLE:View.INVISIBLE);pet.active(visible);handler.removeCallbacks(tick);
+        hideBubble();nextChatter=SystemClock.uptimeMillis()+15000;
         gesture.cancel();recycleVelocity();cancelThrow();pressed=false;moveUntil=0;manualUntil=0;
         if(!visible&&menu!=null)menu.dismiss();
         if(visible){lastTick=SystemClock.uptimeMillis();nextAction=lastTick+3000;pet.play("idle",true);handler.post(tick);}
     }
     @Override public void onSharedPreferenceChanged(SharedPreferences shared,String key){
+        if("chatter".equals(key)){hideBubble();nextChatter=SystemClock.uptimeMillis();return;}
         if("size".equals(key)||"pass".equals(key)||"roam".equals(key)||"throw".equals(key)||(key!=null&&key.startsWith("physics."))){
             if("pass".equals(key)&&prefs.getBoolean("pass",false)){
                 gesture.cancel();recycleVelocity();pressed=false;dragging=false;if(menu!=null)menu.dismiss();
@@ -316,6 +368,7 @@ public final class PetService extends Service implements SharedPreferences.OnSha
     }
     @Override public void onDestroy(){
         running=false;handler.removeCallbacksAndMessages(null);
+        hideBubble();
         fling.stop();recycleVelocity();
         if(menu!=null)menu.dismiss();
         if(pet!=null){pet.active(false);try{windows.removeView(pet);}catch(IllegalArgumentException ignored){}pet=null;}
@@ -326,6 +379,7 @@ public final class PetService extends Service implements SharedPreferences.OnSha
     }
     @Override public void onConfigurationChanged(Configuration configuration){
         super.onConfigurationChanged(configuration);
+        hideBubble();
         gesture.cancel();recycleVelocity();cancelThrow();pressed=false;dragging=false;moveUntil=0;
         // 等显示配置更新完成再按新可用区域恢复位置，避免旋转瞬间使用前一方向的尺寸。
         handler.postDelayed(()->{if(pet!=null)applyLayout();},180);
