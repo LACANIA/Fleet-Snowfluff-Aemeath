@@ -77,6 +77,7 @@ public final class PetService extends Service implements SharedPreferences.OnSha
         }else if(intent!=null){
             String id=intent.getStringExtra("petId");if(id==null)id=store.selected();PetInstance pet=pets.get(id);
             if(pet!=null)pet.perform(action,intent.getStringExtra("animation"));
+            else if(FIND.equals(action))Toast.makeText(this,"这只桌宠已收起，请先打开它的显示开关",Toast.LENGTH_LONG).show();
         }
         // Reused services must recover even if a device delayed or omitted USER_PRESENT.
         refreshVisibility();return START_STICKY;
@@ -117,15 +118,31 @@ public final class PetService extends Service implements SharedPreferences.OnSha
         if(list.size()<2)return;
         PetCollision.Body[] bodies=new PetCollision.Body[list.size()];boolean[] touched=new boolean[list.size()];
         for(int i=0;i<list.size();i++)bodies[i]=list.get(i).body(now);
+        boolean walkKnocks=store.global.getBoolean("walkKnocks",false);
         for(int pass=0;pass<4;pass++){
             boolean hit=false;
-            for(int i=0;i<bodies.length;i++)for(int j=i+1;j<bodies.length;j++)if(PetCollision.resolve(bodies[i],bodies[j])){touched[i]=touched[j]=true;hit=true;}
+            for(int i=0;i<bodies.length;i++)for(int j=i+1;j<bodies.length;j++)if(PetCollision.resolve(bodies[i],bodies[j],walkKnocks)){touched[i]=touched[j]=true;hit=true;}
             if(!hit)break;
         }
         for(int i=0;i<list.size();i++)if(touched[i])list.get(i).contact(bodies[i]);
     }
     int touchLayers(){int count=0;for(PetInstance pet:pets.values()){if(pet.passing())count++;if(pet.hasBubble())count++;}return Math.max(1,count);}
     boolean settingsOpen(){return MainActivity.settingsVisible;}
+    private PetInstance locatingPet(){for(PetInstance pet:pets.values())if(pet.locating())return pet;return null;}
+    float petOpacity(PetInstance pet,float requested){
+        if(!pet.passing())return pet.locating()?1:Math.max(.1f,Math.min(1,requested));
+        PetInstance target=locatingPet();
+        return target!=null&&target.passing()?OverlayOpacity.locating(requested,touchLayers(),target==pet):OverlayOpacity.alpha(requested,touchLayers());
+    }
+    float speechOpacity(float requested,int extraLayers){
+        PetInstance target=locatingPet();int layers=touchLayers()+extraLayers;
+        return target!=null&&target.passing()?OverlayOpacity.locating(requested,layers,false):OverlayOpacity.alpha(requested,layers);
+    }
+    private final Runnable locationExpired=()->opacityChanged();
+    void markLocated(String id){
+        for(PetInstance pet:new ArrayList<>(pets.values()))if(!pet.id.equals(id))pet.clearLocate();
+        opacityChanged();handler.removeCallbacks(locationExpired);handler.postDelayed(locationExpired,PetView.LOCATION_MS);
+    }
     void opacityChanged(){for(PetInstance pet:new ArrayList<>(pets.values()))pet.alpha();}
     boolean bubbleAllowed(String owner,int x,int y,int width,int height){
         for(Map.Entry<String,PetInstance> entry:pets.entrySet())if(!entry.getKey().equals(owner)){
@@ -178,4 +195,10 @@ public final class PetService extends Service implements SharedPreferences.OnSha
         stopForeground(STOP_FOREGROUND_REMOVE);super.onDestroy();
     }
     @Override public IBinder onBind(Intent intent){return null;}
+    @Override protected void dump(java.io.FileDescriptor fd,java.io.PrintWriter writer,String[] args){
+        if((getApplicationInfo().flags&android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE)==0){super.dump(fd,writer,args);return;}
+        org.json.JSONArray states=new org.json.JSONArray();
+        for(PetInstance pet:new ArrayList<>(pets.values()))try{states.put(pet.debugState());}catch(org.json.JSONException ignored){}
+        writer.println("FLYING_STATE "+states);
+    }
 }

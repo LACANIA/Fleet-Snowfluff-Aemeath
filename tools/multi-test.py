@@ -14,6 +14,7 @@ if not serial:
 package = 'io.github.lacania.aemeathpocket.test'
 production = 'io.github.lacania.aemeathpocket'
 component = package + '/' + production + '.MainActivity'
+version = ET.parse(project/'app/src/main/AndroidManifest.xml').getroot().get('{http://schemas.android.com/apk/res/android}versionName')
 out = project / 'test-results' / 'multi-pet'
 out.mkdir(parents=True, exist_ok=True)
 results = []
@@ -62,6 +63,7 @@ def select(name):
         current=global_prefs()['selected']
         assert pet_prefs(current)['name']==name,[(n.get('text'),n.get('class')) for n in root.iter('node') if n.get('text')]
     locate(lambda n:n.get('text')=='下面只修改：'+name)
+    assert pet_prefs(global_prefs()['selected'])['name']==name,'Selection changed during the test'
 def add(role,count=1):
     print('ADD '+role+' '+str(count),flush=True)
     button('添加桌宠');button(role)
@@ -100,15 +102,17 @@ def check_packing():
     for i,(l,t,r,b) in enumerate(frames):
         for a,c,d,e in frames[i+1:]:assert not (l<d and r>a and t<e and b>c),frames
 def slider(description,fraction):
+    selected_before=global_prefs()['selected']
     node=locate(lambda n:n.get('content-desc')==description and n.get('class')=='android.widget.SeekBar')
-    l,t,r,b=rect(node);shell('input','tap',int(l+(r-l)*fraction),(t+b)//2);time.sleep(.3)
+    l,t,r,b=rect(node);shell('input','swipe',int(l+(r-l)*.2),(t+b)//2,int(l+(r-l)*fraction),(t+b)//2,200);time.sleep(.3)
+    assert global_prefs()['selected']==selected_before,'Selection changed during slider interaction'
 
 assert package.endswith('.test') and package!=production
 shell('am','force-stop',production)
 call('uninstall',package,check=False)
 call('install',project/'build/legacy-seed/probe.apk')
 shell('am','start','-n',package+'/io.github.lacania.seed.SeedActivity');time.sleep(.5)
-call('install','-r',project/'dist/Flying-Edelweiss-0.2.0-ui-test.apk')
+call('install','-r',project/('dist/Flying-Edelweiss-'+version+'-ui-test.apk'))
 shell('cmd','appops','set',package,'SYSTEM_ALERT_WINDOW','allow')
 try:
     start()

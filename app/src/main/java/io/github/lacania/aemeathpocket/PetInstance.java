@@ -134,7 +134,10 @@ final class PetInstance extends ContextWrapper {
         if(PetService.PLAY.equals(action))play(animation);
         else if(PetService.HOME.equals(action)){cancelThrow();prefs.edit().putFloat("x",.85f).putFloat("y",.65f).apply();moveUntil=0;applyLayout();}
         else if(PetService.SAY.equals(action))showChatter("idle",true);
-        else if(PetService.FIND.equals(action)){play("wave");showText(name());}
+        else if(PetService.FIND.equals(action)){
+            play("wave");long end=SystemClock.uptimeMillis()+PetView.LOCATION_MS;manualUntil=end;nextAction=end+3000;
+            pet.locate(name());host.markLocated(id);showText(name());bubbleUntil=end;
+        }
     }
     private void stopSelf(){host.hide(id);}
     private int dp(float value){return Math.round(value*getResources().getDisplayMetrics().density);}
@@ -161,7 +164,7 @@ final class PetInstance extends ContextWrapper {
         boolean pass=passing();
         if(pass)layout.flags|=WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;else layout.flags&=~WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
         // Android 12 起，不可触摸的跨应用悬浮窗需低于系统遮挡透明度阈值，才能把点击传给下层。
-        layout.alpha=pass?OverlayOpacity.alpha(prefs.getFloat("opacity",1),host.touchLayers()):Math.max(.1f,Math.min(1,prefs.getFloat("opacity",1)));
+        layout.alpha=host.petOpacity(this,prefs.getFloat("opacity",1));
         updateWindow();
         positionMenu();
     }
@@ -243,7 +246,7 @@ final class PetInstance extends ContextWrapper {
         GradientDrawable background=new GradientDrawable();background.setColor(0xfffff6fb);background.setCornerRadius(dp(13));background.setStroke(dp(1),0xffdcc4d4);text.setBackground(background);
         text.measure(View.MeasureSpec.makeMeasureSpec(Math.min(dp(180),maxX+layout.width-minX),View.MeasureSpec.AT_MOST),View.MeasureSpec.makeMeasureSpec(dp(76),View.MeasureSpec.AT_MOST));
         bubbleLayout=new WindowManager.LayoutParams(text.getMeasuredWidth(),text.getMeasuredHeight(),WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE|WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE|WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL|WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,PixelFormat.TRANSLUCENT);
-        bubbleLayout.gravity=Gravity.TOP|Gravity.LEFT;bubbleLayout.alpha=OverlayOpacity.alpha(.75f,host.touchLayers()+1);if(Build.VERSION.SDK_INT>=30)bubbleLayout.setFitInsetsTypes(0);
+        bubbleLayout.gravity=Gravity.TOP|Gravity.LEFT;bubbleLayout.alpha=host.speechOpacity(.75f,1);if(Build.VERSION.SDK_INT>=30)bubbleLayout.setFitInsetsTypes(0);
         bubbleLayout.setTitle("FlyingSpeech:"+id);
         int[] position=bubblePosition();if(position==null)return;bubbleLayout.x=position[0];bubbleLayout.y=position[1];
         try{bubble=text;host.opacityChanged();windows.addView(text,bubbleLayout);bubbleUntil=now+4500;lastChatter=now;}catch(IllegalArgumentException|SecurityException ignored){bubble=null;host.opacityChanged();}
@@ -332,13 +335,15 @@ final class PetInstance extends ContextWrapper {
             moveUntil=0;cancelThrow();if(pet!=null)pet.play("idle",true);applyLayout();host.opacityChanged();
         }
     }
-    void halt(){gesture.cancel();recycleVelocity();pressed=false;dragging=false;cancelThrow();moveUntil=manualUntil=0;hideBubble();if(menu!=null)menu.dismiss();if(pet!=null)pet.play("idle",true);nextAction=SystemClock.uptimeMillis()+5000;}
+    void halt(){boolean marked=locating();clearLocate();gesture.cancel();recycleVelocity();pressed=false;dragging=false;cancelThrow();moveUntil=manualUntil=0;hideBubble();if(menu!=null)menu.dismiss();if(pet!=null)pet.play("idle",true);nextAction=SystemClock.uptimeMillis()+5000;if(marked)host.opacityChanged();}
     void displayChanged(){halt();applyLayout();}
     void close(){halt();handler.removeCallbacksAndMessages(null);if(pet!=null){pet.active(false);try{windows.removeView(pet);}catch(IllegalArgumentException ignored){}pet=null;}}
     boolean flying(){return fling.isActive();}
     boolean held(){return pressed||menu!=null;}
     boolean passing(){return prefs.getBoolean("pass",false)||host.settingsOpen();}
     boolean hasBubble(){return bubble!=null;}
+    boolean locating(){return pet!=null&&pet.locateUntil()>SystemClock.uptimeMillis();}
+    void clearLocate(){if(pet!=null){boolean marked=locating();pet.clearLocate();if(marked)hideBubble();}}
     int[] frame(){return new int[]{layout.x,layout.y,layout.x+layout.width,layout.y+layout.height};}
     int[] area(){return new int[]{minX,minY,maxX+layout.width,maxY+layout.height};}
     int[] requestedSize(){int[] area=area();int width=Math.min(dp(prefs.getInt("size",128)),Math.min(area[2]-area[0],(int)Math.floor((area[3]-area[1])*assets.width/(double)assets.height)));return new int[]{Math.max(1,width),Math.max(1,(int)Math.round(width*assets.height/(double)assets.width))};}
@@ -348,22 +353,36 @@ final class PetInstance extends ContextWrapper {
         float requested=Math.max(.1f,Math.min(1,prefs.getFloat("opacity",1)));
         if(passing())layout.flags|=WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;else layout.flags&=~WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
         if(host.settingsOpen()&&menu!=null)menu.dismiss();
-        layout.alpha=passing()?OverlayOpacity.alpha(requested,host.touchLayers()):requested;
+        layout.alpha=host.petOpacity(this,requested);
         if(pet.isAttachedToWindow())try{windows.updateViewLayout(pet,layout);}catch(IllegalArgumentException ignored){}
-        if(bubble!=null&&bubble.isAttachedToWindow()){bubbleLayout.alpha=OverlayOpacity.alpha(.75f,host.touchLayers());try{windows.updateViewLayout(bubble,bubbleLayout);}catch(IllegalArgumentException ignored){}}
+        if(bubble!=null){bubbleLayout.alpha=host.speechOpacity(.75f,0);if(bubble.isAttachedToWindow())try{windows.updateViewLayout(bubble,bubbleLayout);}catch(IllegalArgumentException ignored){}}
     }
     void refreshBubble(){positionBubble();}
+    JSONObject debugState() throws org.json.JSONException{
+        return new JSONObject().put("id",id).put("x",layout.x).put("y",layout.y).put("width",layout.width).put("height",layout.height)
+            .put("flying",fling.isActive()).put("walkUntil",moveUntil).put("manualUntil",manualUntil).put("nextAction",nextAction)
+            .put("action",pet.actionId()).put("actionStarted",pet.actionStarted()).put("locateUntil",pet.locateUntil()).put("alpha",layout.alpha)
+            .put("passing",passing()).put("bubbleAlpha",bubble==null?0:bubbleLayout.alpha).put("direction",direction).put("now",SystemClock.uptimeMillis());
+    }
     PetCollision.Body body(long now){
         double vx=fling.isActive()?fling.velocityX():moveUntil>now?direction*dp(38):0,vy=fling.isActive()?fling.velocityY():0;
         if(pressed){vx=now-dragSampleTime<120?dragVx:0;vy=now-dragSampleTime<120?dragVy:0;}
         if(menu!=null){vx=0;vy=0;}
-        return new PetCollision.Body(layout.x+character.body[0]*layout.width,layout.y+character.body[1]*layout.height,(character.body[2]-character.body[0])*layout.width,(character.body[3]-character.body[1])*layout.height,vx,vy,layout.width*(double)layout.width,physicsOptions().elasticity,held());
+        PetCollision.Body body=new PetCollision.Body(layout.x+character.body[0]*layout.width,layout.y+character.body[1]*layout.height,(character.body[2]-character.body[0])*layout.width,(character.body[3]-character.body[1])*layout.height,vx,vy,layout.width*(double)layout.width,physicsOptions().elasticity,held());
+        body.flying=fling.isActive();body.walking=!pressed&&menu==null&&moveUntil>now&&!body.flying;return body;
     }
     void contact(PetCollision.Body body){
         if(held())return;
         int x=Motion.clamp((int)Math.round(body.x-character.body[0]*layout.width),minX,maxX),y=Motion.clamp((int)Math.round(body.y-character.body[1]*layout.height),minY,maxY);
-        boolean wasFlying=fling.isActive();moveUntil=manualUntil=0;nextAction=SystemClock.uptimeMillis()+5000;
+        boolean moved=x!=layout.x||y!=layout.y;
+        if(!body.flying){
+            // Keep animation clocks and the original walk deadline intact on ordinary contact.
+            if(moved&&moveUntil>SystemClock.uptimeMillis()&&x!=layout.x){direction=-direction;pet.play(direction>0?"walk-right":"walk-left",true);}
+            if(moved){layout.x=x;layout.y=y;motionX=x;updateWindow();savePosition();}return;
+        }
+        boolean wasFlying=fling.isActive();
         fling.collision(x,y,body.vx,body.vy,minX,maxX,minY,maxY,getResources().getDisplayMetrics().density,physicsOptions());
+        if(fling.isActive()){moveUntil=manualUntil=0;nextAction=SystemClock.uptimeMillis()+5000;}
         layout.x=x;layout.y=y;motionX=x;updateWindow();if(fling.isActive()&&!wasFlying)pet.play("jump",true);if(!fling.isActive())savePosition();
     }
 }

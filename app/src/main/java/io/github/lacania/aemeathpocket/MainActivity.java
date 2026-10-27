@@ -64,8 +64,11 @@ public final class MainActivity extends Activity {
         Button start=button("启动桌宠",true);root.addView(start,new LinearLayout.LayoutParams(-1,dp(48)));start.setEnabled(!ids.isEmpty());start.setOnClickListener(view->requestStart());
         Button stop=button("全部收起",false);root.addView(stop,new LinearLayout.LayoutParams(-1,dp(44)));margin(stop,6,8);stop.setOnClickListener(view->{store.global.edit().putBoolean("enabled",false).apply();stopService(new Intent(this,PetService.class));updateStatus();});
         Switch overlap=switchView(root,"允许桌宠重叠",store.global.getBoolean("allowOverlap",true));
-        overlap.setOnCheckedChangeListener((view,checked)->{if(!binding)store.overlap(checked);});
-        text(root,"关闭后按身体碰撞箱反弹，双方的弹性共同决定碰撞力度。每次切换都会停止运动并重新排布，避免挤在一起弹飞。",12,MUTED,false);
+        text(root,"关闭后按身体碰撞箱接触，抛射撞击才会撞飞其他宠物。每次切换都会停止运动并重新排布。",12,MUTED,false);
+        Switch walkKnocks=switchView(root,"走动也能撞飞",store.global.getBoolean("walkKnocks",false));walkKnocks.setEnabled(!overlap.isChecked());
+        walkKnocks.setOnCheckedChangeListener((view,checked)->{if(!binding)store.global.edit().putBoolean("walkKnocks",checked).apply();});
+        overlap.setOnCheckedChangeListener((view,checked)->{walkKnocks.setEnabled(!checked);if(!binding)store.overlap(checked);});
+        text(root,"仅在关闭重叠时生效。开启后，走动者继续走完本次时间，被撞者按抛射规则弹跳、下落和继续碰撞。",12,MUTED,false);
         Button arrange=button("重新排布桌宠",false);root.addView(arrange,new LinearLayout.LayoutParams(-1,dp(44)));arrange.setOnClickListener(view->{store.arrange();toast("已重新排布");});
         text(root,"数量或大小排不下时，会临时缩小显示；各自设置的大小会保留。",12,MUTED,false);
         if(!ids.isEmpty()){
@@ -77,7 +80,7 @@ public final class MainActivity extends Activity {
             renderSelected();
         }else{TextView empty=text(root,"列表已经清空，点击“添加桌宠”选择角色。",15,MUTED,false);margin(empty,24,12);}
         TextView help=text(root,"原地长按约 0.6 秒后松手打开单只菜单，拖动可以换位置。熄屏暂停绘制，解锁或回到应用时重新检查显示状态。",13,MUTED,false);margin(help,20,8);
-        text(root,"个人测试版 0.2.0 · 本地运行",12,MUTED,false);
+        text(root,"个人测试版 0.2.1 · 本地运行",12,MUTED,false);
         setContentView(scroll);binding=false;updateStatus();
     }
     private void renderSelected(){
